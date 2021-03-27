@@ -1,5 +1,5 @@
 const server = "localhost";
-const port = "80";
+const port = "8080";
 
 function request(reqContent){
     return new Promise(function(resolve, reject){
@@ -10,7 +10,10 @@ function request(reqContent){
                 resolve(this.responseText)
             }else if(this.readyState == 4 && this.responseText != ""){
                 alert(this.responseText)
-                reject();
+                reject(this.status);
+            }else if(this.readyState == 4){
+                alert("Unknown error");
+                reject(this.status);
             }
         }
         xmlhttp.open("GET", reqContent, true);
@@ -21,7 +24,7 @@ function request(reqContent){
 
 window.addEventListener("DOMContentLoaded", (event) => {
     //request default message
-    // let msg = "http://localhost:8080/?token=63edmpDS92zFLY7sL79f&guild=718471398426673252&channel=718471398938509332&msg=807665330671059002";
+    // let msg = "http://localhost:8080/?token=424242424242424242&guild=424242424242424242&channel=424242424242424242&msg=424242424242424242";
     //   request(msg).then((value) => {
     //     document.getElementsByTagName("textarea")[0].innerHTML = value;
     //     clean_ig();
@@ -33,6 +36,7 @@ document.getElementsByTagName("textarea")[0].addEventListener("input", function(
     counter();
 })
 
+//replace every markdown syntax by design
 function clean_ig(){
     let content = document.getElementsByTagName("textarea")[0].value;
     content = content.replaceAll(/\n/g, ' <br> \n');
@@ -50,7 +54,7 @@ function clean_ig(){
     document.getElementsByClassName("right")[0].innerHTML = content;
 }
 
-
+//create span for mention and other tag
 function tag(content){
     const regexp = /(#)|(@)/g;
     const array = [...content.matchAll(regexp)];
@@ -88,10 +92,10 @@ document.getElementById("save").addEventListener("click", function(){
     let token = document.getElementById("token").value;
     let guild = document.getElementById("guild").value;
     let channel = document.getElementById("channel").value;
-    let msg = document.getElementById("msg").value;
-    let ok = `http://${server}:${port}/pingu/edit/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}&content=${content}`;
-    request(ok).then((value) => {
-        if(value != "good"){
+    let req = document.getElementById("msg").value;
+    let reqSave = `http://${server}:${port}/edit/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}&content=${content}`;
+    request(reqSave).then((status) => {
+        if(status != 200){
             onOff(true, "save")
         }
     });
@@ -105,12 +109,11 @@ document.getElementById("connect").addEventListener("click", function(){
     let guild = document.getElementById("guild").value;
     let channel = document.getElementById("channel").value;
     let msg = document.getElementById("msg").value;
-    let reqMsg = `http://${server}:${port}/pingu/get/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}`;
+    let reqMsg = `http://${server}:${port}/get/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}`;
     request(reqMsg).then((value) => {
         console.log(value)
         document.getElementsByTagName("textarea")[0].innerHTML = "";
         document.getElementsByTagName("textarea")[0].innerHTML = value;
-        console.log("ok")
         onOff(true, "connect")
         clean_ig();
         counter();
@@ -118,11 +121,26 @@ document.getElementById("connect").addEventListener("click", function(){
     console.log("loaded")
 })
 
-document.getElementById("channel-test").addEventListener("click", function(){
-
+document.getElementById("test").addEventListener("click", function(){
+    let content = document.getElementsByTagName("textarea")[0].value;
+    content = content.replaceAll(/\n/g, '\n');
+    content = encodeURIComponent(content);
+    let token = document.getElementById("token").value;
+    let guild = document.getElementById("guild").value;
+    let channel = document.getElementById("channel-test").value;
+    let req = document.getElementById("msg").value;
+    let reqTest = `http://${server}:${port}/new/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}&content=${content}`;
+    request(reqTest).then((status) => {
+        if(status != 200){
+            onOff(true, "save")
+        }
+    });
+    console.log("loaded")
 });
 
 function counter(){
+// 23
+// 22
     let char = document.getElementsByTagName("textarea")[0].value.length;
 
     document.getElementById("char").innerText = char;
@@ -148,5 +166,4 @@ function onOff(on, element){
         elt.disabled = true;
     }
 }
-// 23
-// 22
+
