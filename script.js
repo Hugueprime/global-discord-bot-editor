@@ -92,7 +92,7 @@ document.getElementById("save").addEventListener("click", function(){
     let token = document.getElementById("token").value;
     let guild = document.getElementById("guild").value;
     let channel = document.getElementById("channel").value;
-    let req = document.getElementById("msg").value;
+    let msg = document.getElementById("msg").value;
     let reqSave = `http://${server}:${port}/edit/?token=${token}&guild=${guild}&channel=${channel}&msg=${msg}&content=${content}`;
     request(reqSave).then((status) => {
         if(status != 200){

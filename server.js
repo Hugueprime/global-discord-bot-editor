@@ -36,7 +36,7 @@ app.get('/get', function(req, res) {//send msg to file
         client.guilds.cache.get(req.query.guild).channels.cache.get(req.query.channel).messages.fetch(req.query.msg).catch(error => {
             res.status(500).send("msg doesn't exist");
         }).then( async(msg)=>{
-            if(msg.author.id !== client.user.id){
+            if(msg.author.id != client.user.id){
                 res.status(500).send("msg not from bot");
             }else{
                 let content = msg.content;
@@ -73,7 +73,10 @@ app.get('/edit', function(req, res) {
     content = decodeURIComponent(content)
     if(req.query.token == config.client_token){
         client.guilds.cache.get(req.query.guild).channels.cache.get(req.query.channel).messages.fetch(req.query.msg).catch(error => {
-            res.status(500).send("fetch failed, message probably deleted");
+            console.log(error)
+            if(error){
+                res.status(500).send("fetch failed, message probably deleted");
+            }
         }).then(async (message)=>{
             try {
                 content = await tag(content, req.query.guild)
@@ -88,6 +91,7 @@ app.get('/edit', function(req, res) {
                     res.status(500).send("too much chars server doesn't like it, less chars server happy");
                 }
             } catch (error) {
+                console.log("fafeiled")
                 res.send(error)
             }
         })
